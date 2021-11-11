@@ -69,6 +69,7 @@ namespace FillingShapes
                         break;
                     }
             }
+            DrawAllShapes();
             SetOptionsForCorrectShape();
         }
 
@@ -106,22 +107,26 @@ namespace FillingShapes
                         break;
                     }
             }
+            DrawAllShapes();
         }
 
         private void createButton_MouseDown(object sender, MouseEventArgs e)
         {
+            UnSelectShape();
+            SetState();
             switch (State)
             {
                 case State.Default:
                     {
                         SelectedPolygon = new Polygon();
                         SetState(State.NewShape);
+                        SelectedPolygon.Select();
                         break;
                     }
             }
         }
 
-        private void addButton_MouseClick(object sender, MouseEventArgs e)
+        private void addButton_MouseDown(object sender, MouseEventArgs e)
         {
             switch (State)
             {
@@ -130,7 +135,6 @@ namespace FillingShapes
                         if (SelectedPolygon.CheckIfCorrect())
                         {
                             _polygons.Add(SelectedPolygon);
-                            DrawAllShapes();
                         }
                         break;
                     }
@@ -144,7 +148,7 @@ namespace FillingShapes
             UnSelectShape();
         }
 
-        private void deleteButton_MouseClick(object sender, MouseEventArgs e)
+        private void deleteButton_MouseDown(object sender, MouseEventArgs e)
         {
             switch (State)
             {

@@ -31,13 +31,13 @@ namespace FillingShapes
         {
             this.mainTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.optionsTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
+            this.createButton = new System.Windows.Forms.Button();
             this.positionLabel = new System.Windows.Forms.Label();
             this.positionYTextBox = new System.Windows.Forms.TextBox();
             this.deleteButton = new System.Windows.Forms.Button();
             this.addButton = new System.Windows.Forms.Button();
             this.positionXTextBox = new System.Windows.Forms.TextBox();
             this.mainPictureBox = new System.Windows.Forms.PictureBox();
-            this.createButton = new System.Windows.Forms.Button();
             this.mainTableLayoutPanel.SuspendLayout();
             this.optionsTableLayoutPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.mainPictureBox)).BeginInit();
@@ -89,6 +89,20 @@ namespace FillingShapes
             this.optionsTableLayoutPanel.Size = new System.Drawing.Size(193, 555);
             this.optionsTableLayoutPanel.TabIndex = 2;
             // 
+            // createButton
+            // 
+            this.createButton.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.optionsTableLayoutPanel.SetColumnSpan(this.createButton, 3);
+            this.createButton.Location = new System.Drawing.Point(3, 417);
+            this.createButton.Name = "createButton";
+            this.createButton.Size = new System.Drawing.Size(187, 63);
+            this.createButton.TabIndex = 3;
+            this.createButton.Text = "Create Polygon";
+            this.createButton.UseVisualStyleBackColor = true;
+            this.createButton.MouseDown += new System.Windows.Forms.MouseEventHandler(this.createButton_MouseDown);
+            // 
             // positionLabel
             // 
             this.positionLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -125,6 +139,7 @@ namespace FillingShapes
             this.deleteButton.TabIndex = 4;
             this.deleteButton.Text = "Delete";
             this.deleteButton.UseVisualStyleBackColor = true;
+            this.deleteButton.MouseDown += new System.Windows.Forms.MouseEventHandler(this.deleteButton_MouseDown);
             // 
             // addButton
             // 
@@ -136,6 +151,7 @@ namespace FillingShapes
             this.addButton.TabIndex = 3;
             this.addButton.Text = "Add";
             this.addButton.UseVisualStyleBackColor = true;
+            this.addButton.MouseDown += new System.Windows.Forms.MouseEventHandler(this.addButton_MouseDown);
             // 
             // positionXTextBox
             // 
@@ -162,20 +178,6 @@ namespace FillingShapes
             this.mainPictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.mainPictureBox_MouseDown);
             this.mainPictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.mainPictureBox_MouseMove);
             this.mainPictureBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.mainPictureBox_MouseUp);
-            // 
-            // createButton
-            // 
-            this.createButton.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.optionsTableLayoutPanel.SetColumnSpan(this.createButton, 3);
-            this.createButton.Location = new System.Drawing.Point(3, 417);
-            this.createButton.Name = "createButton";
-            this.createButton.Size = new System.Drawing.Size(187, 63);
-            this.createButton.TabIndex = 3;
-            this.createButton.Text = "Create Polygon";
-            this.createButton.UseVisualStyleBackColor = true;
-            this.createButton.MouseDown += new System.Windows.Forms.MouseEventHandler(this.createButton_MouseDown);
             // 
             // MainForm
             // 

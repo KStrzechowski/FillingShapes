@@ -69,7 +69,7 @@ namespace FillingShapes
         {
             vertice.Select();
             SelectedEdge = new Edge(SelectedVertice, vertice);
-            SetState(State.MoveVertice);
+            SetState(State.SelectedEdge);
         }
 
         private void MoveObject(IGraphicObject graphicObject, Point position)
@@ -105,7 +105,7 @@ namespace FillingShapes
 
         private void UnSelectEdge()
         {
-            if (SelectedVertice != null)
+            if (SelectedEdge != null)
             {
                 SelectedEdge.VerticeFirst.UnSelect();
                 SelectedEdge.VerticeFirst.Draw();

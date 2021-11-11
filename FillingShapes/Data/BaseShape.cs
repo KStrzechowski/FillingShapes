@@ -60,8 +60,6 @@ namespace FillingShapes.Data
 
         public virtual void Draw()
         {
-            if (_vertices.Count == 0)
-                return;
             var points = _vertices;
             Color color;
             if (IsSelected)
