@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31624.102
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FillingShapes", "FillingShapes.csproj", "{8242CEFD-F380-4849-A56E-5C89C9D69010}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8242CEFD-F380-4849-A56E-5C89C9D69010}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8242CEFD-F380-4849-A56E-5C89C9D69010}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8242CEFD-F380-4849-A56E-5C89C9D69010}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8242CEFD-F380-4849-A56E-5C89C9D69010}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A739B8BC-2346-435A-9B6D-128D55E127B2}
+	EndGlobalSection
+EndGlobal
