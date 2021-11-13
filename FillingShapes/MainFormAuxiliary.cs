@@ -149,21 +149,31 @@ namespace FillingShapes
         private void NewPolygonOptions()
         {
             PolygonOptions();
+            addButton.Enabled = true;
         }
 
         private void PolygonOptions()
         {
+            colorButton.Enabled = textureButton.Enabled = true;
+            deleteButton.Enabled = true;
         }
 
         private void VerticeOptions()
         {
+            colorButton.Enabled = true;
+            deleteButton.Enabled = true;
         }
+
         private void EdgeOptions()
         {
+            addButton.Enabled = true;
         }
 
         private void HideAllOptions()
         {
+            colorButton.Enabled = textureButton.Enabled = false;
+            addButton.Enabled = deleteButton.Enabled = false;
+            positionXTextBox.Enabled = positionYTextBox.Enabled = false;
         }
 
         private bool CheckIfShape()
@@ -215,5 +225,12 @@ namespace FillingShapes
             }
             return false;
         }
+
+
+        private void MoveAllShapes()
+        {   
+
+        }
+
     }
 }

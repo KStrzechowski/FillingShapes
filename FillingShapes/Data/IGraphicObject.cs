@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FillingShapes.Enums;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -14,5 +15,7 @@ namespace FillingShapes.Data
         public bool CheckIfClicked(Point point);
         public void Move(Point startingPoint, Point endingPoint);
         public void Draw();
+        public void ChangeColor(Color color);
+        public Direction WallEncountered();
     }
 }

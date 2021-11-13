@@ -27,7 +27,8 @@ namespace FillingShapes
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            State = State.Default;
+            HideAllOptions();
+            SetState();
         }
 
         private void mainPictureBox_MouseDown(object sender, MouseEventArgs e)
@@ -167,6 +168,44 @@ namespace FillingShapes
             }
             SetState();
             UnSelectShape();
+        }
+
+        private void colorButton_MouseDown(object sender, MouseEventArgs e)
+        {
+            ColorDialog colorDialog = new ColorDialog();
+            switch (State)
+            {
+                case State.NewShape:
+                case State.SelectedShape:
+                    {
+                        if (colorDialog.ShowDialog() == DialogResult.OK)
+                        {
+                            SelectedPolygon.ChangeColor(colorDialog.Color);
+                        }
+                        break;
+                    }
+                case State.SelectedVertice:
+                    {
+                        if (colorDialog.ShowDialog() == DialogResult.OK)
+                        {
+                            SelectedVertice.ChangeColor(colorDialog.Color);
+                        }
+                        break;
+                    }
+            }
+            DrawAllShapes();
+        }
+
+        private void textureButton_MouseDown(object sender, MouseEventArgs e)
+        {
+            switch (State)
+            {
+                case State.NewShape:
+                case State.SelectedShape:
+                    {
+                        break;
+                    }
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FillingShapes.Enums;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -10,16 +11,16 @@ namespace FillingShapes.Data
     public abstract class BaseShape : IGraphicObject
     {
         protected readonly List<Vertice> _vertices;
+        protected Color _color;
         protected bool IsSelected { get; set; }
         public static Graphics Graphics { get; set; }
         public static Bitmap Bitmap { get; set; }
-        public static int MaxHeigth { get; set; }
-        public static int MaxWidth { get; set; }
 
         public BaseShape()
         {
             _vertices = new();
             IsSelected = true;
+            _color = Color.Black;
         }
 
         public void Select() => IsSelected = true;
@@ -69,10 +70,10 @@ namespace FillingShapes.Data
 
             for (int i = 0; i < points.Count - 1; i++)
             {
-                DrawLine(points[i].GetPosition(), points[i + 1].GetPosition(), color);
+                DrawLine(points[i].GetPosition(), points[i + 1].GetPosition(), _color);
                 points[i].Draw();
             }
-            DrawLine(points[points.Count - 1].GetPosition(), points[0].GetPosition(), color);
+            DrawLine(points[points.Count - 1].GetPosition(), points[0].GetPosition(), _color);
             points[points.Count - 1].Draw();
         }
 
@@ -160,6 +161,25 @@ namespace FillingShapes.Data
                     }
                 }
             }
+        }
+
+        public void ChangeColor(Color color) => _color = color;
+
+        public Direction WallEncountered()
+        {
+            foreach (var vertice in _vertices)
+            {
+                if (vertice.GetPosition().X < 0)
+                    return Direction.Left;
+                else if (vertice.GetPosition().X >= Bitmap.Width)
+                    return Direction.Right;
+                else if (vertice.GetPosition().Y < 0)
+                    return Direction.Up;
+                else if (vertice.GetPosition().Y >= Bitmap.Height)
+                    return Direction.Down;
+            }
+
+            return Direction.None;
         }
     }
 }

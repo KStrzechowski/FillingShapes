@@ -37,6 +37,8 @@ namespace FillingShapes
             this.deleteButton = new System.Windows.Forms.Button();
             this.addButton = new System.Windows.Forms.Button();
             this.positionXTextBox = new System.Windows.Forms.TextBox();
+            this.colorButton = new System.Windows.Forms.Button();
+            this.textureButton = new System.Windows.Forms.Button();
             this.mainPictureBox = new System.Windows.Forms.PictureBox();
             this.mainTableLayoutPanel.SuspendLayout();
             this.optionsTableLayoutPanel.SuspendLayout();
@@ -54,8 +56,7 @@ namespace FillingShapes
             this.mainTableLayoutPanel.Location = new System.Drawing.Point(0, 0);
             this.mainTableLayoutPanel.Name = "mainTableLayoutPanel";
             this.mainTableLayoutPanel.RowCount = 1;
-            this.mainTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this.mainTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 66.66666F));
+            this.mainTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.mainTableLayoutPanel.Size = new System.Drawing.Size(984, 561);
             this.mainTableLayoutPanel.TabIndex = 2;
             // 
@@ -74,6 +75,8 @@ namespace FillingShapes
             this.optionsTableLayoutPanel.Controls.Add(this.deleteButton, 0, 7);
             this.optionsTableLayoutPanel.Controls.Add(this.addButton, 1, 7);
             this.optionsTableLayoutPanel.Controls.Add(this.positionXTextBox, 1, 0);
+            this.optionsTableLayoutPanel.Controls.Add(this.colorButton, 0, 1);
+            this.optionsTableLayoutPanel.Controls.Add(this.textureButton, 1, 1);
             this.optionsTableLayoutPanel.Location = new System.Drawing.Point(3, 3);
             this.optionsTableLayoutPanel.Name = "optionsTableLayoutPanel";
             this.optionsTableLayoutPanel.RowCount = 8;
@@ -163,6 +166,33 @@ namespace FillingShapes
             this.positionXTextBox.TabIndex = 8;
             this.positionXTextBox.Text = "0";
             // 
+            // colorButton
+            // 
+            this.colorButton.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.colorButton.Location = new System.Drawing.Point(3, 72);
+            this.colorButton.Name = "colorButton";
+            this.colorButton.Size = new System.Drawing.Size(91, 57);
+            this.colorButton.TabIndex = 10;
+            this.colorButton.Text = "Color";
+            this.colorButton.UseVisualStyleBackColor = true;
+            this.colorButton.MouseDown += new System.Windows.Forms.MouseEventHandler(this.colorButton_MouseDown);
+            // 
+            // textureButton
+            // 
+            this.textureButton.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.optionsTableLayoutPanel.SetColumnSpan(this.textureButton, 2);
+            this.textureButton.Location = new System.Drawing.Point(100, 72);
+            this.textureButton.Name = "textureButton";
+            this.textureButton.Size = new System.Drawing.Size(90, 57);
+            this.textureButton.TabIndex = 11;
+            this.textureButton.Text = "Texture";
+            this.textureButton.UseVisualStyleBackColor = true;
+            this.textureButton.MouseDown += new System.Windows.Forms.MouseEventHandler(this.textureButton_MouseDown);
+            // 
             // mainPictureBox
             // 
             this.mainPictureBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -207,6 +237,8 @@ namespace FillingShapes
         private System.Windows.Forms.TextBox positionYTextBox;
         private System.Windows.Forms.TextBox positionXTextBox;
         private System.Windows.Forms.Button createButton;
+        private System.Windows.Forms.Button colorButton;
+        private System.Windows.Forms.Button textureButton;
     }
 }
 
