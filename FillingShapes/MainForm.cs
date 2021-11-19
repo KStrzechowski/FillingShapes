@@ -1,4 +1,5 @@
 ﻿using FillingShapes.Data;
+using FillingShapes.Data.Decorator;
 using FillingShapes.Enums;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -15,11 +17,14 @@ namespace FillingShapes
     public partial class MainForm : Form
     {
         private readonly List<Polygon> _polygons = new();
+        List<IGraphicObject> movingShapes;
         private Point _position;
+        private Speed _speed = new(5);
         private Polygon SelectedPolygon { get; set; }
         private Vertice SelectedVertice { get; set; }
         private Edge SelectedEdge { get; set; }
         private State State { get; set; }
+
         public MainForm()
         {
             InitializeComponent();
@@ -28,7 +33,7 @@ namespace FillingShapes
         private void MainForm_Load(object sender, EventArgs e)
         {
             HideAllOptions();
-            SetState();
+            SetAllDefault();
         }
 
         private void mainPictureBox_MouseDown(object sender, MouseEventArgs e)
@@ -71,7 +76,7 @@ namespace FillingShapes
                     }
             }
             DrawAllShapes();
-            SetOptionsForCorrectShape();
+            SetCorrectOptions();
         }
 
         private void mainPictureBox_MouseMove(object sender, MouseEventArgs e)
@@ -81,12 +86,12 @@ namespace FillingShapes
             {
                 case State.MoveShape:
                     {
-                        MoveObject(SelectedPolygon, position);
+                        MoveShape(SelectedPolygon, position);
                         break;
                     }
                 case State.MoveVertice:
                     {
-                        MoveObject(SelectedVertice, position);
+                        MoveVertice(SelectedPolygon, SelectedVertice, position);
                         break;
                     }
             }
@@ -206,6 +211,29 @@ namespace FillingShapes
                         break;
                     }
             }
+        }
+
+        private void startButton_MouseDown(object sender, MouseEventArgs e)
+        {
+            switch (State)
+            {
+                case State.Playing:
+                    {
+                        StopMoving();
+                        break;
+                    }
+                default:
+                    {
+                        StartMoving();
+                        break;
+                    }
+            }
+            SetCorrectOptions();
+        }
+
+        private void speedTrackBar_ValueChanged(object sender, EventArgs e)
+        {
+            _speed.Value = speedTrackBar.Value;
         }
     }
 }

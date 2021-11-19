@@ -15,7 +15,11 @@ namespace FillingShapes.Data
 
         public virtual void Remove(Vertice vertice) => _vertices.Remove(vertice);
 
-        public virtual void AddVertice(Vertice vertice) => _vertices.Add(vertice);
+        public virtual void AddVertice(Vertice vertice)
+        {
+            _vertices.Add(vertice);
+            CheckBoundaries();
+        }
 
         public virtual void AddVerticeBetween(Vertice firstVertice, Vertice secondVertice)
         {

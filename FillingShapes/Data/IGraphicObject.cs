@@ -16,6 +16,7 @@ namespace FillingShapes.Data
         public void Move(Point startingPoint, Point endingPoint);
         public void Draw();
         public void ChangeColor(Color color);
-        public Direction WallEncountered();
+        public Direction IsOutsideArea();
+        public Direction IsNextToWall();
     }
 }

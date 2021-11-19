@@ -15,6 +15,14 @@ namespace FillingShapes.Data
         protected bool IsSelected { get; set; }
         public static Graphics Graphics { get; set; }
         public static Bitmap Bitmap { get; set; }
+        private Boundaries _boundariesIndex;
+        private struct Boundaries
+        {
+            public int mostUp;
+            public int mostDown;
+            public int mostRight;
+            public int mostLeft;
+        }
 
         public BaseShape()
         {
@@ -56,6 +64,50 @@ namespace FillingShapes.Data
                 var position = new Point(endingPoint.X + (vertice.GetPosition().X - startingPoint.X),
                 endingPoint.Y + (vertice.GetPosition().Y - startingPoint.Y));
                 vertice.SetPosition(position);
+            }
+            IsWallEncounter();
+        }
+
+        public virtual void MoveVertice(Vertice vertice, Point startingPoint, Point endingPoint)
+        {
+            vertice.Move(startingPoint, endingPoint);
+            CheckBoundaries();
+        }
+
+        protected virtual void IsWallEncounter()
+        {
+            var direction = IsOutsideArea();
+            Point endingPoint = new Point(0, 0);
+            if (direction == Direction.Up)
+                endingPoint = new Point(0, - _vertices[_boundariesIndex.mostUp].GetPosition().Y);
+            else if (direction == Direction.Down)
+                endingPoint = new Point(0, Bitmap.Height - _vertices[_boundariesIndex.mostDown].GetPosition().Y);
+            else if (direction == Direction.Right)
+                endingPoint = new Point(Bitmap.Width - _vertices[_boundariesIndex.mostRight].GetPosition().X, 0);
+            else if (direction == Direction.Left)
+                endingPoint = new Point(- _vertices[_boundariesIndex.mostLeft].GetPosition().X, 0);
+
+            if (endingPoint.X != 0 || endingPoint.Y != 0)
+                Move(new Point(0, 0), endingPoint);
+        }
+
+        protected virtual void CheckBoundaries()
+        {
+            _boundariesIndex.mostUp = 0;
+            _boundariesIndex.mostDown = 0;
+            _boundariesIndex.mostLeft = 0;
+            _boundariesIndex.mostRight = 0;
+
+            foreach (var vertice in _vertices)
+            {
+                if (_vertices[_boundariesIndex.mostUp].GetPosition().Y > vertice.GetPosition().Y)
+                    _boundariesIndex.mostUp = _vertices.IndexOf(vertice);
+                if (_vertices[_boundariesIndex.mostDown].GetPosition().Y < vertice.GetPosition().Y)
+                    _boundariesIndex.mostDown = _vertices.IndexOf(vertice);
+                if (_vertices[_boundariesIndex.mostRight].GetPosition().X < vertice.GetPosition().X)
+                    _boundariesIndex.mostRight = _vertices.IndexOf(vertice);
+                if (_vertices[_boundariesIndex.mostLeft].GetPosition().X > vertice.GetPosition().X)
+                    _boundariesIndex.mostLeft = _vertices.IndexOf(vertice);
             }
         }
 
@@ -165,19 +217,32 @@ namespace FillingShapes.Data
 
         public void ChangeColor(Color color) => _color = color;
 
-        public Direction WallEncountered()
+        public Direction IsOutsideArea()
         {
-            foreach (var vertice in _vertices)
-            {
-                if (vertice.GetPosition().X < 0)
-                    return Direction.Left;
-                else if (vertice.GetPosition().X >= Bitmap.Width)
-                    return Direction.Right;
-                else if (vertice.GetPosition().Y < 0)
-                    return Direction.Up;
-                else if (vertice.GetPosition().Y >= Bitmap.Height)
-                    return Direction.Down;
-            }
+            if (_vertices[_boundariesIndex.mostLeft].GetPosition().X < 0)
+                return Direction.Left;
+            else if (_vertices[_boundariesIndex.mostRight].GetPosition().X > Bitmap.Width)
+                return Direction.Right;
+            else if (_vertices[_boundariesIndex.mostUp].GetPosition().Y < 0)
+                return Direction.Up;
+            else if (_vertices[_boundariesIndex.mostDown].GetPosition().Y > Bitmap.Height)
+                return Direction.Down;
+
+
+            return Direction.None;
+        }
+
+        public Direction IsNextToWall()
+        {
+            if (_vertices[_boundariesIndex.mostLeft].GetPosition().X <= 1)
+                return Direction.Left;
+            else if (_vertices[_boundariesIndex.mostRight].GetPosition().X >=  Bitmap.Width - 1)
+                return Direction.Right;
+            else if (_vertices[_boundariesIndex.mostUp].GetPosition().Y <= 1)
+                return Direction.Up;
+            else if (_vertices[_boundariesIndex.mostDown].GetPosition().Y >= Bitmap.Height - 1)
+                return Direction.Down;
+
 
             return Direction.None;
         }

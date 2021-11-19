@@ -1,4 +1,5 @@
 ﻿using FillingShapes.Data;
+using FillingShapes.Data.Decorator;
 using FillingShapes.Enums;
 using System;
 using System.Collections.Generic;
@@ -28,8 +29,7 @@ namespace FillingShapes
         private void SetAllDefault()
         {
             SetState();
-            SelectedPolygon.UnSelect();
-            SelectedVertice.UnSelect();
+            UnSelectShape();
         }
 
         private void DrawAllShapes()
@@ -72,9 +72,15 @@ namespace FillingShapes
             SetState(State.SelectedEdge);
         }
 
-        private void MoveObject(IGraphicObject graphicObject, Point position)
+        private void MoveShape(IGraphicObject graphicObject, Point position)
         {
             graphicObject.Move(_position, position);
+            DrawAllShapes();
+        }
+
+        private void MoveVertice(BaseShape baseShape, Vertice vertice, Point position)
+        {
+            baseShape.MoveVertice(vertice, _position, position);
             DrawAllShapes();
         }
 
@@ -116,7 +122,7 @@ namespace FillingShapes
             }
         }
 
-        private void SetOptionsForCorrectShape()
+        private void SetCorrectOptions()
         {
             HideAllOptions();
             switch (State)
@@ -141,6 +147,11 @@ namespace FillingShapes
                 case State.SelectedEdge:
                     {
                         EdgeOptions();
+                        break;
+                    }
+                case State.Playing:
+                    {
+                        PlayingOptons();
                         break;
                     }
             }
@@ -169,12 +180,24 @@ namespace FillingShapes
             addButton.Enabled = true;
         }
 
+        private void PlayingOptons()
+        {
+            startButton.Text = "Pause";
+            createButton.Enabled = false;
+            speedTrackBar.Enabled = true;
+        }
+
         private void HideAllOptions()
         {
             colorButton.Enabled = textureButton.Enabled = false;
             addButton.Enabled = deleteButton.Enabled = false;
             positionXTextBox.Enabled = positionYTextBox.Enabled = false;
+            speedTrackBar.Enabled = false;
+            createButton.Enabled = true;
+            startButton.Text = "Start";
         }
+
+
 
         private bool CheckIfShape()
         {
@@ -226,11 +249,34 @@ namespace FillingShapes
             return false;
         }
 
+        private void StartMoving()
+        {
+            movingShapes = new();
+            Random random = new Random();
+            foreach (var polygon in _polygons)
+            {
+                movingShapes.Add(new MoveRandomly(polygon, random.Next(0, 359), _speed));
+            }
 
-        private void MoveAllShapes()
-        {   
-
+            timer.Start();
+            SetState(State.Playing);
         }
 
+        private void StopMoving()
+        {
+            timer.Stop();
+            SetState();
+            movingShapes.Clear();
+        }
+
+        private void CountDown(object sender, EventArgs e)
+        {
+            foreach (var shape in movingShapes)
+            {
+                shape.Move(new Point(0, 0), new Point(1, 1));
+                SetBitmap();
+            }
+            DrawAllShapes();
+        }
     }
 }

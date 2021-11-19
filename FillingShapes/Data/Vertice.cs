@@ -25,6 +25,7 @@ namespace FillingShapes.Data
         public Vertice(Point position, Color color)
         {
             _position = position;
+            IsOutsideArea();
             _color = color;
         }
 
@@ -50,6 +51,24 @@ namespace FillingShapes.Data
             var position = new Point(endingPoint.X + (GetPosition().X - startingPoint.X),
                 endingPoint.Y + (GetPosition().Y - startingPoint.Y));
             SetPosition(position);
+            isWallEncounter();
+        }
+
+        private void isWallEncounter()
+        {
+            var direction = IsOutsideArea();
+            Point endingPoint = new Point(0, 0);
+            if (direction == Direction.Down)
+                endingPoint = new Point(0, Bitmap.Height - GetPosition().Y);
+            else if (direction == Direction.Up)
+                endingPoint = new Point(0, - GetPosition().Y);
+            else if (direction == Direction.Left)
+                endingPoint = new Point(- GetPosition().X, 0);
+            else if (direction == Direction.Right)
+                endingPoint = new Point(Bitmap.Width - GetPosition().X, 0);
+
+            if (endingPoint.X != 0 || endingPoint.Y != 0)
+                Move(new Point(0, 0), endingPoint);
         }
 
         public void Draw()
@@ -68,17 +87,31 @@ namespace FillingShapes.Data
             return Math.Floor((Math.Sqrt(Math.Pow(GetPosition().X - point.X, 2) + Math.Pow(GetPosition().Y - point.Y, 2))));
         }
 
-        public Direction WallEncountered()
+        public Direction IsOutsideArea()
         {
             if (GetPosition().X < 0)
                 return Direction.Left;
-            else if (GetPosition().X >= Bitmap.Width)
+            else if (GetPosition().X > Bitmap.Width)
                 return Direction.Right;
             else if (GetPosition().Y < 0)
                 return Direction.Up;
-            else if (GetPosition().Y >= Bitmap.Height)
+            else if (GetPosition().Y > Bitmap.Height)
                 return Direction.Down;
             
+            return Direction.None;
+        }
+
+        public Direction IsNextToWall()
+        {
+            if (GetPosition().X <= 1)
+                return Direction.Left;
+            else if (GetPosition().X >= Bitmap.Width - 1)
+                return Direction.Right;
+            else if (GetPosition().Y <= 1)
+                return Direction.Up;
+            else if (GetPosition().Y >= Bitmap.Height - 1)
+                return Direction.Down;
+
             return Direction.None;
         }
     }

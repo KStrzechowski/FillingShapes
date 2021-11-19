@@ -15,5 +15,6 @@ namespace FillingShapes.Enums
         SelectedEdge,
         MoveShape,
         MoveVertice,
+        Playing,
     }
 }

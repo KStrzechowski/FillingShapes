@@ -10,15 +10,14 @@ namespace FillingShapes.Data.Decorator
 {
     public class MoveRandomly : BaseDecorator
     {
-        //public double SpeedFactor { get; set; }
         private int _angle;
         private double _verticalMove;
         private double _horizontalMove;
-        public MoveRandomly(IGraphicObject graphicObject, double speedFactor) : base(graphicObject)
+        private Speed _speed;
+        public MoveRandomly(IGraphicObject graphicObject, int angle, Speed speed) : base(graphicObject)
         {
-            //SpeedFactor = speedFactor;
-            var random = new Random();
-            _angle = random.Next(0, 359);
+            _angle = angle;
+            _speed = speed;
         }
 
         private void ChangeDirection(int minimumAngle, int maximumAngle)
@@ -31,66 +30,47 @@ namespace FillingShapes.Data.Decorator
 
         public void calculateDisplacement()
         {
-            int angle;
-            if (_angle < 90)
-            {
-                angle = _angle;
-                _verticalMove += angle / 90;
-                _horizontalMove += (90 - angle) / 90;
-            }
-            else if (_angle < 180)
-            {
-                angle = _angle - 90;
-                _verticalMove += (90 - angle) / 90;
-                _horizontalMove -= angle / 90;
-            }
-            else if (_angle < 270)
-            {
-                angle = _angle - 180;
-                _verticalMove += angle / 90;
-                _horizontalMove -= (90 - angle) / 90;
-            }
-            else
-            {
-                angle = _angle - 270;
-                _verticalMove -= (90 - angle) / 90;
-                _horizontalMove += angle / 90;
-            }
+            _verticalMove += Math.Sin(Math.PI * _angle / 180);
+            _horizontalMove += Math.Cos(Math.PI * _angle / 180);
         }
 
-        public void Move()
+        public override void Move(Point startingPoint, Point endingPoint)
         {
-            if (_verticalMove > 1)
+            for (int i = 0; i < _speed.Value; i++)
             {
-                _graphicObject.Move(new Point(0, 0), new Point(0, 1));
-                _verticalMove -= 1;
-            }
-            else if (_verticalMove < -1)
-            {
-                _graphicObject.Move(new Point(0, 0), new Point(0, -1));
-                _verticalMove += 1;
-            }
-            if (_horizontalMove > 1)
-            {
-                _graphicObject.Move(new Point(0, 0), new Point(1, 0));
-                _horizontalMove -= 1;
-            }
-            else if (_horizontalMove < -1)
-            {
-                _graphicObject.Move(new Point(0, 0), new Point(-1, 0));
-                _horizontalMove += 1;
+                calculateDisplacement();
+
+                if (_verticalMove >= 1)
+                {
+                    _graphicObject.Move(startingPoint, new Point(0, endingPoint.Y - startingPoint.Y));
+                    _verticalMove -= 1;
+                }
+                else if (_verticalMove <= -1)
+                {
+                    _graphicObject.Move(startingPoint, new Point(0, startingPoint.Y - endingPoint.Y));
+                    _verticalMove += 1;
+                }
+                if (_horizontalMove >= 1)
+                {
+                    _graphicObject.Move(startingPoint, new Point(endingPoint.X - startingPoint.X, 0));
+                    _horizontalMove -= 1;
+                }
+                else if (_horizontalMove <= -1)
+                {
+                    _graphicObject.Move(startingPoint, new Point(startingPoint.X - endingPoint.X, 0));
+                    _horizontalMove += 1;
+                }
             }
 
-            var direction = _graphicObject.WallEncountered();
+            var direction = _graphicObject.IsNextToWall();
             if (direction == Direction.Down)
-                ChangeDirection(0, 180);
+                ChangeDirection(181, 359);
             else if (direction == Direction.Up)
-                ChangeDirection(180, 360);
+                ChangeDirection(1, 179);
             else if (direction == Direction.Left)
-                ChangeDirection(-90, 90);
+                ChangeDirection(-89, 89);
             else if (direction == Direction.Right)
-                ChangeDirection(90, 180);
+                ChangeDirection(91, 269);
         }
-
     }
 }

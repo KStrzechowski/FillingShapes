@@ -46,9 +46,14 @@ namespace FillingShapes.Data
             _graphicObject.ChangeColor(color);
         }
 
-        public Direction WallEncountered()
+        public Direction IsOutsideArea()
         {
-            return _graphicObject.WallEncountered();
+            return _graphicObject.IsOutsideArea();
+        }
+
+        public Direction IsNextToWall()
+        {
+            return _graphicObject.IsNextToWall();
         }
     }
 }
