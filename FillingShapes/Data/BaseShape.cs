@@ -324,10 +324,10 @@ namespace FillingShapes.Data
                 double ratio = (double)edge.VerticeFirst.CalculateDistance(point)
                     / (double)edge.VerticeFirst.CalculateDistance(edge.VerticeSecond.GetPosition());
                 color = Color.FromArgb(
-                    (int)(edge.VerticeFirst.GetColor().A * ratio + edge.VerticeSecond.GetColor().A * (1 - ratio)),
-                    (int)(edge.VerticeFirst.GetColor().R * ratio + edge.VerticeSecond.GetColor().R * (1 - ratio)),
-                    (int)(edge.VerticeFirst.GetColor().G * ratio + edge.VerticeSecond.GetColor().G * (1 - ratio)),
-                    (int)(edge.VerticeFirst.GetColor().B * ratio + edge.VerticeSecond.GetColor().B * (1 - ratio))
+                    (int)(edge.VerticeFirst.GetColor().A * (1 - ratio) + edge.VerticeSecond.GetColor().A * ratio),
+                    (int)(edge.VerticeFirst.GetColor().R * (1 - ratio) + edge.VerticeSecond.GetColor().R * ratio),
+                    (int)(edge.VerticeFirst.GetColor().G * (1 - ratio) + edge.VerticeSecond.GetColor().G * ratio),
+                    (int)(edge.VerticeFirst.GetColor().B * (1 - ratio) + edge.VerticeSecond.GetColor().B * ratio)
                     );
             }
             return color;
