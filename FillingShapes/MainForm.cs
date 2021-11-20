@@ -74,6 +74,11 @@ namespace FillingShapes
                         }
                         break;
                     }
+                case State.SelectedEdge:
+                    {
+                        UnSelectShape();
+                        break;
+                    }
             }
             DrawAllShapes();
             SetCorrectOptions();
@@ -234,6 +239,16 @@ namespace FillingShapes
         private void speedTrackBar_ValueChanged(object sender, EventArgs e)
         {
             _speed.Value = speedTrackBar.Value;
+        }
+
+        private void solidColoringButton_MouseDown(object sender, MouseEventArgs e)
+        {
+            SelectedPolygon.ColoringType = Coloring.Solid;
+        }
+
+        private void interpolationColoringButton_MouseDown(object sender, MouseEventArgs e)
+        {
+            SelectedPolygon.ColoringType = Coloring.Interpolation;
         }
     }
 }

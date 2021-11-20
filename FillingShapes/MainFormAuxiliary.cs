@@ -167,6 +167,7 @@ namespace FillingShapes
         {
             colorButton.Enabled = textureButton.Enabled = true;
             deleteButton.Enabled = true;
+            solidColoringButton.Enabled = interpolationColoringButton.Enabled = true;
         }
 
         private void VerticeOptions()
@@ -190,6 +191,7 @@ namespace FillingShapes
         private void HideAllOptions()
         {
             colorButton.Enabled = textureButton.Enabled = false;
+            solidColoringButton.Enabled = interpolationColoringButton.Enabled = false;
             addButton.Enabled = deleteButton.Enabled = false;
             positionXTextBox.Enabled = positionYTextBox.Enabled = false;
             speedTrackBar.Enabled = false;

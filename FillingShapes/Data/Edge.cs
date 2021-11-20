@@ -15,5 +15,25 @@ namespace FillingShapes.Data
             VerticeFirst = verticeFirst;
             VerticeSecond = verticeSecond;
         }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null || !(obj is Edge))
+            {
+                return false;
+            }
+
+            if ((VerticeFirst.GetPosition() == ((Edge)obj).VerticeFirst.GetPosition())
+                && (VerticeSecond.GetPosition() == ((Edge)obj).VerticeSecond.GetPosition())
+                || ((VerticeFirst.GetPosition() == ((Edge)obj).VerticeSecond.GetPosition())
+                && (VerticeSecond.GetPosition() == ((Edge)obj).VerticeFirst.GetPosition())))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 }

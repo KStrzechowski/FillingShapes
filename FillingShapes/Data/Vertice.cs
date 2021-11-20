@@ -81,6 +81,7 @@ namespace FillingShapes.Data
         }
 
         public void ChangeColor(Color color) => _color = color;
+        public Color GetColor() => _color;
 
         public double CalculateDistance(Point point)
         {

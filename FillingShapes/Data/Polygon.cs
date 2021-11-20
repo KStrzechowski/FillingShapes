@@ -13,12 +13,18 @@ namespace FillingShapes.Data
         {
         }
 
-        public virtual void Remove(Vertice vertice) => _vertices.Remove(vertice);
+        public virtual void Remove(Vertice vertice)
+        {
+            _vertices.Remove(vertice);
+            Sort();
+        }
+
 
         public virtual void AddVertice(Vertice vertice)
         {
             _vertices.Add(vertice);
             CheckBoundaries();
+            Sort();
         }
 
         public virtual void AddVerticeBetween(Vertice firstVertice, Vertice secondVertice)
@@ -28,6 +34,7 @@ namespace FillingShapes.Data
             var newVertice = new Vertice(point);
             int indexOfFirst = _vertices.IndexOf(firstVertice);
             int indexOfSecond = _vertices.IndexOf(secondVertice);
+            int indexOfNew;
             if (indexOfFirst > indexOfSecond)
             {
                 if (indexOfSecond == 0 && indexOfFirst == _vertices.Count - 1)
@@ -42,6 +49,8 @@ namespace FillingShapes.Data
                 else
                     _vertices.Insert(indexOfSecond, newVertice);
             }
+
+            Sort();
         }
 
         public bool CheckIfClickedVertice(Point point, out Vertice clickedVertice)

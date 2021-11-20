@@ -11,6 +11,8 @@ namespace FillingShapes.Data
     public abstract class BaseShape : IGraphicObject
     {
         protected readonly List<Vertice> _vertices;
+        protected List<int> _sortedVerticeIndexes;
+        public Coloring ColoringType { get; set; }
         protected Color _color;
         protected bool IsSelected { get; set; }
         public static Graphics Graphics { get; set; }
@@ -27,7 +29,9 @@ namespace FillingShapes.Data
         public BaseShape()
         {
             _vertices = new();
+            _sortedVerticeIndexes = new();
             IsSelected = true;
+            ColoringType = Coloring.Solid;
             _color = Color.Black;
         }
 
@@ -72,6 +76,7 @@ namespace FillingShapes.Data
         {
             vertice.Move(startingPoint, endingPoint);
             CheckBoundaries();
+            Sort();
         }
 
         protected virtual void IsWallEncounter()
@@ -79,16 +84,22 @@ namespace FillingShapes.Data
             var direction = IsOutsideArea();
             Point endingPoint = new Point(0, 0);
             if (direction == Direction.Up)
-                endingPoint = new Point(0, - _vertices[_boundariesIndex.mostUp].GetPosition().Y);
+                endingPoint = new Point(0, -_vertices[_boundariesIndex.mostUp].GetPosition().Y);
             else if (direction == Direction.Down)
                 endingPoint = new Point(0, Bitmap.Height - _vertices[_boundariesIndex.mostDown].GetPosition().Y);
             else if (direction == Direction.Right)
                 endingPoint = new Point(Bitmap.Width - _vertices[_boundariesIndex.mostRight].GetPosition().X, 0);
             else if (direction == Direction.Left)
-                endingPoint = new Point(- _vertices[_boundariesIndex.mostLeft].GetPosition().X, 0);
+                endingPoint = new Point(-_vertices[_boundariesIndex.mostLeft].GetPosition().X, 0);
 
             if (endingPoint.X != 0 || endingPoint.Y != 0)
                 Move(new Point(0, 0), endingPoint);
+        }
+
+        protected void Sort()
+        {
+            _sortedVerticeIndexes = Enumerable.Range(0, _vertices.Count).ToList();
+            _sortedVerticeIndexes.Sort((x, y) => _vertices[x].GetPosition().Y < _vertices[y].GetPosition().Y ? 1 : -1);
         }
 
         protected virtual void CheckBoundaries()
@@ -120,6 +131,8 @@ namespace FillingShapes.Data
             else
                 color = Color.Black;
 
+            if (points.Count > 2)
+                Fill();
             for (int i = 0; i < points.Count - 1; i++)
             {
                 DrawLine(points[i].GetPosition(), points[i + 1].GetPosition(), _color);
@@ -215,6 +228,134 @@ namespace FillingShapes.Data
             }
         }
 
+        protected virtual void Fill()
+        {
+            int yMin = _vertices[_sortedVerticeIndexes[^1]].GetPosition().Y;
+            int yMax = _vertices[_sortedVerticeIndexes[0]].GetPosition().Y;
+            List<Edge> Aet = new();
+
+            for (int y = yMin; y <= yMax; y++)
+            {
+                for (int i = 0; i < _vertices.Count; i++)
+                {
+                    Vertice vertice = _vertices[_sortedVerticeIndexes[i]];
+                    if (vertice.GetPosition().Y == y - 1)
+                    {
+                        Vertice prev = _sortedVerticeIndexes[i] == 0 ? _vertices[_vertices.Count - 1] : _vertices[_sortedVerticeIndexes[i] - 1];
+                        if (vertice.GetPosition().Y <= prev.GetPosition().Y)
+                            Aet.Add(new Edge(prev, vertice));
+                        else 
+                           Aet.RemoveAll(x => x.Equals(new Edge(prev, vertice)));
+
+                        Vertice next = _sortedVerticeIndexes[i] == _vertices.Count - 1 
+                            ? _vertices[0] : _vertices[_sortedVerticeIndexes[i] + 1];
+                        if (vertice.GetPosition().Y <= next.GetPosition().Y)
+                            Aet.Add(new Edge(next, vertice));
+                        else
+                            Aet.RemoveAll(x => x.Equals(new Edge(next, vertice)));
+                    }
+                }
+
+                Aet.Sort((i, j) => CalculatePointPosition(i, y).X > CalculatePointPosition(j, y).X ? 1 : -1);
+                for (int i = 0; i < Aet.Count - 1; i += 2)
+                {
+                    Point left = CalculatePointPosition(Aet[i], y);
+                    Point right = CalculatePointPosition(Aet[i + 1], y);
+                    for (int x = left.X; x <= right.X; x++)
+                    {
+                        if (Bitmap.Width > x && x >= 0 && Bitmap.Height > y && y >= 0)
+                        {
+                            ChooseColoring(x, y, Aet[i], left, Aet[i + 1], right);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void ChooseColoring(int x, int y, Edge leftEdge, Point leftPoint, Edge rightEdge, Point rightPoint)
+        {
+            switch(ColoringType)
+            {
+                case Coloring.Solid:
+                    {
+                        SolidColoring(x, y);
+                        break;
+                    }
+                case Coloring.Interpolation:
+                    {
+                        InterpolationColoring(x, y, leftEdge, leftPoint, rightEdge, rightPoint);
+                        break;
+                    }
+                case Coloring.Texture:
+                    {
+                        TextureColoring(x, y);
+                        break;
+                    }
+            }
+        }
+
+        private void SolidColoring(int x, int y)
+        {
+            Bitmap.SetPixel(x, y, _color);
+        }
+
+        private void InterpolationColoring(int x, int y, Edge leftEdge, Point leftPoint, Edge rightEdge, Point rightPoint)
+        {
+            Color leftPointColor = CalculateColorOnEdge(leftEdge, leftPoint);
+            Color rightPointColor = CalculateColorOnEdge(rightEdge, rightPoint);
+            Vertice leftVertice = new Vertice(leftPoint, leftPointColor);
+            Vertice rightVertice = new Vertice(rightPoint, rightPointColor);
+            Color color = CalculateColorOnEdge(new Edge(rightVertice, leftVertice), new Point(x, y));
+            Bitmap.SetPixel(x, y, color);
+        }
+
+        private Color CalculateColorOnEdge(Edge edge, Point point)
+        {
+            Color color;
+            if (edge.VerticeFirst.CalculateDistance(edge.VerticeSecond.GetPosition()) == 0)
+                color = Color.FromArgb(
+                    (edge.VerticeFirst.GetColor().A + edge.VerticeSecond.GetColor().A) / 2,
+                    (edge.VerticeFirst.GetColor().R + edge.VerticeSecond.GetColor().R) / 2,
+                    (edge.VerticeFirst.GetColor().G + edge.VerticeSecond.GetColor().G) / 2,
+                    (edge.VerticeFirst.GetColor().B + edge.VerticeSecond.GetColor().B) / 2
+                    );
+            else
+            {
+                double ratio = (double)edge.VerticeFirst.CalculateDistance(point)
+                    / (double)edge.VerticeFirst.CalculateDistance(edge.VerticeSecond.GetPosition());
+                color = Color.FromArgb(
+                    (int)(edge.VerticeFirst.GetColor().A * ratio + edge.VerticeSecond.GetColor().A * (1 - ratio)),
+                    (int)(edge.VerticeFirst.GetColor().R * ratio + edge.VerticeSecond.GetColor().R * (1 - ratio)),
+                    (int)(edge.VerticeFirst.GetColor().G * ratio + edge.VerticeSecond.GetColor().G * (1 - ratio)),
+                    (int)(edge.VerticeFirst.GetColor().B * ratio + edge.VerticeSecond.GetColor().B * (1 - ratio))
+                    );
+            }
+            return color;
+        }
+
+        private void TextureColoring(int x, int y)
+        {
+
+        }
+
+        private Point CalculatePointPosition(Edge edge, int height)
+        {
+            if (edge.VerticeFirst.GetPosition().Y == edge.VerticeSecond.GetPosition().Y)
+                return new Point(edge.VerticeFirst.GetPosition().X, height);
+            if (edge.VerticeFirst.GetPosition().X > edge.VerticeSecond.GetPosition().X)
+            {
+                Vertice temp = edge.VerticeFirst;
+                edge.VerticeFirst = edge.VerticeSecond;
+                edge.VerticeSecond = temp;
+            }
+
+            int x =  edge.VerticeFirst.GetPosition().X + Math.Abs(((edge.VerticeFirst.GetPosition().Y - height) 
+                * (edge.VerticeFirst.GetPosition().X - edge.VerticeSecond.GetPosition().X))
+                / (edge.VerticeFirst.GetPosition().Y - edge.VerticeSecond.GetPosition().Y));
+
+            return new Point(x, height);
+        }
+
         public void ChangeColor(Color color) => _color = color;
 
         public Direction IsOutsideArea()
@@ -227,7 +368,6 @@ namespace FillingShapes.Data
                 return Direction.Up;
             else if (_vertices[_boundariesIndex.mostDown].GetPosition().Y > Bitmap.Height)
                 return Direction.Down;
-
 
             return Direction.None;
         }
@@ -242,7 +382,6 @@ namespace FillingShapes.Data
                 return Direction.Up;
             else if (_vertices[_boundariesIndex.mostDown].GetPosition().Y >= Bitmap.Height - 1)
                 return Direction.Down;
-
 
             return Direction.None;
         }
