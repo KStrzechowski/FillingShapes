@@ -14,9 +14,8 @@ namespace FillingShapes.Data
         public void UnSelect();
         public bool CheckIfClicked(Point point);
         public void Move(Point startingPoint, Point endingPoint);
-        public void Draw();
-        public void ChangeColor(Color color);
+        public Task Draw();
+        public void SetColor(Color color);
         public Direction IsOutsideArea();
-        public Direction IsNextToWall();
     }
 }

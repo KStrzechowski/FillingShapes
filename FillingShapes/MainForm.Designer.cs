@@ -36,7 +36,7 @@ namespace FillingShapes
             this.deleteButton = new System.Windows.Forms.Button();
             this.addButton = new System.Windows.Forms.Button();
             this.colorButton = new System.Windows.Forms.Button();
-            this.textureButton = new System.Windows.Forms.Button();
+            this.textureColoringButton = new System.Windows.Forms.Button();
             this.startButton = new System.Windows.Forms.Button();
             this.speedTrackBar = new System.Windows.Forms.TrackBar();
             this.speedLabel = new System.Windows.Forms.Label();
@@ -81,15 +81,15 @@ namespace FillingShapes
             this.optionsTableLayoutPanel.Controls.Add(this.deleteButton, 0, 8);
             this.optionsTableLayoutPanel.Controls.Add(this.addButton, 1, 8);
             this.optionsTableLayoutPanel.Controls.Add(this.colorButton, 0, 6);
-            this.optionsTableLayoutPanel.Controls.Add(this.textureButton, 1, 6);
             this.optionsTableLayoutPanel.Controls.Add(this.startButton, 0, 2);
             this.optionsTableLayoutPanel.Controls.Add(this.speedTrackBar, 0, 1);
             this.optionsTableLayoutPanel.Controls.Add(this.speedLabel, 0, 0);
             this.optionsTableLayoutPanel.Controls.Add(this.positionLabel, 0, 3);
             this.optionsTableLayoutPanel.Controls.Add(this.positionXTextBox, 1, 3);
             this.optionsTableLayoutPanel.Controls.Add(this.positionYTextBox, 2, 3);
-            this.optionsTableLayoutPanel.Controls.Add(this.solidColoringButton, 0, 5);
-            this.optionsTableLayoutPanel.Controls.Add(this.interpolationColoringButton, 1, 5);
+            this.optionsTableLayoutPanel.Controls.Add(this.solidColoringButton, 1, 6);
+            this.optionsTableLayoutPanel.Controls.Add(this.interpolationColoringButton, 0, 5);
+            this.optionsTableLayoutPanel.Controls.Add(this.textureColoringButton, 1, 5);
             this.optionsTableLayoutPanel.Location = new System.Drawing.Point(3, 3);
             this.optionsTableLayoutPanel.Name = "optionsTableLayoutPanel";
             this.optionsTableLayoutPanel.RowCount = 9;
@@ -155,19 +155,19 @@ namespace FillingShapes
             this.colorButton.UseVisualStyleBackColor = true;
             this.colorButton.MouseDown += new System.Windows.Forms.MouseEventHandler(this.colorButton_MouseDown);
             // 
-            // textureButton
+            // textureColoringButton
             // 
-            this.textureButton.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.textureColoringButton.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.optionsTableLayoutPanel.SetColumnSpan(this.textureButton, 2);
-            this.textureButton.Location = new System.Drawing.Point(100, 349);
-            this.textureButton.Name = "textureButton";
-            this.textureButton.Size = new System.Drawing.Size(90, 63);
-            this.textureButton.TabIndex = 11;
-            this.textureButton.Text = "Texture";
-            this.textureButton.UseVisualStyleBackColor = true;
-            this.textureButton.MouseDown += new System.Windows.Forms.MouseEventHandler(this.textureButton_MouseDown);
+            this.optionsTableLayoutPanel.SetColumnSpan(this.textureColoringButton, 2);
+            this.textureColoringButton.Location = new System.Drawing.Point(100, 280);
+            this.textureColoringButton.Name = "textureColoringButton";
+            this.textureColoringButton.Size = new System.Drawing.Size(90, 63);
+            this.textureColoringButton.TabIndex = 11;
+            this.textureColoringButton.Text = "Texture Coloring";
+            this.textureColoringButton.UseVisualStyleBackColor = true;
+            this.textureColoringButton.MouseDown += new System.Windows.Forms.MouseEventHandler(this.textureColoringButton_MouseDown);
             // 
             // startButton
             // 
@@ -190,11 +190,12 @@ namespace FillingShapes
             | System.Windows.Forms.AnchorStyles.Right)));
             this.optionsTableLayoutPanel.SetColumnSpan(this.speedTrackBar, 3);
             this.speedTrackBar.Location = new System.Drawing.Point(3, 38);
+            this.speedTrackBar.Maximum = 50;
             this.speedTrackBar.Minimum = 1;
             this.speedTrackBar.Name = "speedTrackBar";
             this.speedTrackBar.Size = new System.Drawing.Size(187, 29);
             this.speedTrackBar.TabIndex = 12;
-            this.speedTrackBar.Value = 5;
+            this.speedTrackBar.Value = 10;
             this.speedTrackBar.ValueChanged += new System.EventHandler(this.speedTrackBar_ValueChanged);
             // 
             // speedLabel
@@ -254,9 +255,10 @@ namespace FillingShapes
             this.solidColoringButton.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.solidColoringButton.Location = new System.Drawing.Point(3, 280);
+            this.optionsTableLayoutPanel.SetColumnSpan(this.solidColoringButton, 2);
+            this.solidColoringButton.Location = new System.Drawing.Point(100, 349);
             this.solidColoringButton.Name = "solidColoringButton";
-            this.solidColoringButton.Size = new System.Drawing.Size(91, 63);
+            this.solidColoringButton.Size = new System.Drawing.Size(90, 63);
             this.solidColoringButton.TabIndex = 14;
             this.solidColoringButton.Text = "Solid Coloring";
             this.solidColoringButton.UseVisualStyleBackColor = true;
@@ -267,11 +269,10 @@ namespace FillingShapes
             this.interpolationColoringButton.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.optionsTableLayoutPanel.SetColumnSpan(this.interpolationColoringButton, 2);
             this.interpolationColoringButton.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.interpolationColoringButton.Location = new System.Drawing.Point(100, 280);
+            this.interpolationColoringButton.Location = new System.Drawing.Point(3, 280);
             this.interpolationColoringButton.Name = "interpolationColoringButton";
-            this.interpolationColoringButton.Size = new System.Drawing.Size(90, 63);
+            this.interpolationColoringButton.Size = new System.Drawing.Size(91, 63);
             this.interpolationColoringButton.TabIndex = 15;
             this.interpolationColoringButton.Text = "Interpolation Coloring";
             this.interpolationColoringButton.UseVisualStyleBackColor = true;
@@ -328,7 +329,7 @@ namespace FillingShapes
         private System.Windows.Forms.TextBox positionXTextBox;
         private System.Windows.Forms.Button createButton;
         private System.Windows.Forms.Button colorButton;
-        private System.Windows.Forms.Button textureButton;
+        private System.Windows.Forms.Button textureColoringButton;
         private System.Windows.Forms.Button startButton;
         private System.Windows.Forms.Timer timer;
         private System.Windows.Forms.TrackBar speedTrackBar;

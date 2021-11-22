@@ -36,24 +36,19 @@ namespace FillingShapes.Data
             _graphicObject.Move(startingPoint, endingPoint);
         }
 
-        public virtual void Draw()
+        public virtual async Task Draw()
         {
-            _graphicObject.Draw();
+            await _graphicObject.Draw();
         }
 
-        public virtual void ChangeColor(Color color)
+        public virtual void SetColor(Color color)
         {
-            _graphicObject.ChangeColor(color);
+            _graphicObject.SetColor(color);
         }
 
         public Direction IsOutsideArea()
         {
             return _graphicObject.IsOutsideArea();
-        }
-
-        public Direction IsNextToWall()
-        {
-            return _graphicObject.IsNextToWall();
         }
     }
 }

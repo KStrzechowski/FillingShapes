@@ -35,5 +35,10 @@ namespace FillingShapes.Data
                 return false;
             }
         }
+
+        public override int GetHashCode()
+        {
+            return VerticeFirst.GetHashCode() * VerticeSecond.GetHashCode();
+        }
     }
 }

@@ -17,10 +17,8 @@ namespace FillingShapes
             mainPictureBox.Image = new Bitmap(mainPictureBox.Width, mainPictureBox.Height);
             Bitmap bitmap = (Bitmap)mainPictureBox.Image;
             Graphics graphics = Graphics.FromImage(mainPictureBox.Image);
-            BaseShape.Bitmap = bitmap;
-            BaseShape.Graphics = graphics;
-            Vertice.Bitmap = bitmap;
-            Vertice.Graphics = graphics;
+            BaseGraphicObject.Bitmap = bitmap;
+            BaseGraphicObject.Graphics = graphics;
         }
 
         private void SetState() => State = State.Default;
@@ -35,12 +33,20 @@ namespace FillingShapes
         private void DrawAllShapes()
         {
             SetBitmap();
+            Task task = null;
             if (State == State.NewShape)
-                SelectedPolygon.Draw();
-            foreach (var polygon in _polygons)
+                task = SelectedPolygon.Draw();
+            Task[] tasks = new Task[_polygons.Count];
+            int i = 0;
+            foreach(var polygon in _polygons)
             {
-                polygon.Draw();
-            }
+                tasks[i] = polygon.Draw();
+                i++;
+            };
+
+            Task.WaitAll(tasks);
+            if (task != null)
+                task.Wait();
         }
 
         private void SelectShape(Point point)
@@ -78,7 +84,7 @@ namespace FillingShapes
             DrawAllShapes();
         }
 
-        private void MoveVertice(BaseShape baseShape, Vertice vertice, Point position)
+        private void MoveVertice(Polygon baseShape, Vertice vertice, Point position)
         {
             baseShape.MoveVertice(vertice, _position, position);
             DrawAllShapes();
@@ -91,9 +97,9 @@ namespace FillingShapes
                 UnSelectVertice();
                 HideAllOptions();
                 SelectedPolygon.UnSelect();
-                DrawAllShapes();
                 SelectedPolygon = null;
                 SetState(State.Default);
+                DrawAllShapes();
             }
         }
 
@@ -121,7 +127,7 @@ namespace FillingShapes
                 SetState(State.SelectedShape);
             }
         }
-
+        
         private void SetCorrectOptions()
         {
             HideAllOptions();
@@ -165,7 +171,7 @@ namespace FillingShapes
 
         private void PolygonOptions()
         {
-            colorButton.Enabled = textureButton.Enabled = true;
+            colorButton.Enabled = textureColoringButton.Enabled = true;
             deleteButton.Enabled = true;
             solidColoringButton.Enabled = interpolationColoringButton.Enabled = true;
         }
@@ -190,7 +196,7 @@ namespace FillingShapes
 
         private void HideAllOptions()
         {
-            colorButton.Enabled = textureButton.Enabled = false;
+            colorButton.Enabled = textureColoringButton.Enabled = false;
             solidColoringButton.Enabled = interpolationColoringButton.Enabled = false;
             addButton.Enabled = deleteButton.Enabled = false;
             positionXTextBox.Enabled = positionYTextBox.Enabled = false;
@@ -198,8 +204,6 @@ namespace FillingShapes
             createButton.Enabled = true;
             startButton.Text = "Start";
         }
-
-
 
         private bool CheckIfShape()
         {
@@ -253,11 +257,11 @@ namespace FillingShapes
 
         private void StartMoving()
         {
-            movingShapes = new();
+            _movingShapes = new();
             Random random = new Random();
             foreach (var polygon in _polygons)
             {
-                movingShapes.Add(new MoveRandomly(polygon, random.Next(0, 359), _speed));
+                _movingShapes.Add(new MoveRandomly(polygon, random.Next(0, 359), _speed));
             }
 
             timer.Start();
@@ -268,12 +272,12 @@ namespace FillingShapes
         {
             timer.Stop();
             SetState();
-            movingShapes.Clear();
+            _movingShapes.Clear();
         }
 
         private void CountDown(object sender, EventArgs e)
         {
-            foreach (var shape in movingShapes)
+            foreach (var shape in _movingShapes)
             {
                 shape.Move(new Point(0, 0), new Point(1, 1));
                 SetBitmap();

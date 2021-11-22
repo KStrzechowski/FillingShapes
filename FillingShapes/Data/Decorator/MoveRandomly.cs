@@ -28,7 +28,7 @@ namespace FillingShapes.Data.Decorator
                 _angle += 360;
         }
 
-        public void calculateDisplacement()
+        public void calculatePlacement()
         {
             _verticalMove += Math.Sin(Math.PI * _angle / 180);
             _horizontalMove += Math.Cos(Math.PI * _angle / 180);
@@ -38,7 +38,7 @@ namespace FillingShapes.Data.Decorator
         {
             for (int i = 0; i < _speed.Value; i++)
             {
-                calculateDisplacement();
+                calculatePlacement();
 
                 if (_verticalMove >= 1)
                 {
@@ -62,7 +62,7 @@ namespace FillingShapes.Data.Decorator
                 }
             }
 
-            var direction = _graphicObject.IsNextToWall();
+            var direction = _graphicObject.IsOutsideArea();
             if (direction == Direction.Down)
                 ChangeDirection(181, 359);
             else if (direction == Direction.Up)

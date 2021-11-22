@@ -17,7 +17,7 @@ namespace FillingShapes
     public partial class MainForm : Form
     {
         private readonly List<Polygon> _polygons = new();
-        List<IGraphicObject> movingShapes;
+        List<IGraphicObject> _movingShapes;
         private Point _position;
         private Speed _speed = new(5);
         private Polygon SelectedPolygon { get; set; }
@@ -80,8 +80,9 @@ namespace FillingShapes
                         break;
                     }
             }
-            DrawAllShapes();
             SetCorrectOptions();
+            DrawAllShapes();
+
         }
 
         private void mainPictureBox_MouseMove(object sender, MouseEventArgs e)
@@ -190,7 +191,7 @@ namespace FillingShapes
                     {
                         if (colorDialog.ShowDialog() == DialogResult.OK)
                         {
-                            SelectedPolygon.ChangeColor(colorDialog.Color);
+                            SelectedPolygon.SetColor(colorDialog.Color);
                         }
                         break;
                     }
@@ -198,7 +199,7 @@ namespace FillingShapes
                     {
                         if (colorDialog.ShowDialog() == DialogResult.OK)
                         {
-                            SelectedVertice.ChangeColor(colorDialog.Color);
+                            SelectedVertice.SetColor(colorDialog.Color);
                         }
                         break;
                     }
@@ -206,17 +207,7 @@ namespace FillingShapes
             DrawAllShapes();
         }
 
-        private void textureButton_MouseDown(object sender, MouseEventArgs e)
-        {
-            switch (State)
-            {
-                case State.NewShape:
-                case State.SelectedShape:
-                    {
-                        break;
-                    }
-            }
-        }
+
 
         private void startButton_MouseDown(object sender, MouseEventArgs e)
         {
@@ -244,11 +235,38 @@ namespace FillingShapes
         private void solidColoringButton_MouseDown(object sender, MouseEventArgs e)
         {
             SelectedPolygon.ColoringType = Coloring.Solid;
+            DrawAllShapes();
         }
 
         private void interpolationColoringButton_MouseDown(object sender, MouseEventArgs e)
         {
             SelectedPolygon.ColoringType = Coloring.Interpolation;
+            DrawAllShapes();
+        }
+
+        private void textureColoringButton_MouseDown(object sender, MouseEventArgs e)
+        {
+            SelectedPolygon.ColoringType = Coloring.Texture;
+            OpenFileDialog loadFileDialog = new OpenFileDialog();
+            loadFileDialog.Filter = "Picture files|*.png;*.jpg;*.bmp";
+            loadFileDialog.FilterIndex = 1;
+            loadFileDialog.RestoreDirectory = true;
+
+            switch (State)
+            {
+                case State.NewShape:
+                case State.SelectedShape:
+                    {
+                        if (loadFileDialog.ShowDialog() == DialogResult.OK)
+                        {
+                            var fileName = loadFileDialog.FileName;
+                            var image = Image.FromFile(fileName);
+                            SelectedPolygon.SetTexture(image);
+                        }
+                        break;
+                    }
+            }
+            DrawAllShapes();
         }
     }
 }
