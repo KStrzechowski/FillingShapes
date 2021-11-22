@@ -17,7 +17,7 @@ namespace FillingShapes.Data
         protected Color _color;
         protected bool IsSelected { get; set; }
         public static Graphics Graphics { get; set; }
-        public static Bitmap Bitmap { get; set; }
+        public static DirectBitmap Bitmap { get; set; }
 
 
         public BaseGraphicObject()

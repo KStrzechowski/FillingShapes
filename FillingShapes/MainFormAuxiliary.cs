@@ -14,11 +14,10 @@ namespace FillingShapes
     {
         private void SetBitmap()
         {
-            mainPictureBox.Image = new Bitmap(mainPictureBox.Width, mainPictureBox.Height);
-            Bitmap bitmap = (Bitmap)mainPictureBox.Image;
-            Graphics graphics = Graphics.FromImage(mainPictureBox.Image);
-            BaseGraphicObject.Bitmap = bitmap;
-            BaseGraphicObject.Graphics = graphics;
+            DirectBitmap directBitmap = new DirectBitmap(mainPictureBox.Width, mainPictureBox.Height);
+            BaseGraphicObject.Bitmap = directBitmap;
+            BaseGraphicObject.Graphics = Graphics.FromImage(directBitmap.Bitmap);
+            mainPictureBox.Image = directBitmap.Bitmap;
         }
 
         private void SetState() => State = State.Default;
