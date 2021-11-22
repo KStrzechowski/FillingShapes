@@ -12,13 +12,11 @@ namespace FillingShapes.Data
     {
         protected readonly List<Vertice> _vertices;
         protected List<int> _sortedVerticeIndexes; 
-        protected readonly static object _lock = new object();
         public Coloring ColoringType { get; set; }
         protected Color _color;
         protected bool IsSelected { get; set; }
         public static Graphics Graphics { get; set; }
         public static DirectBitmap Bitmap { get; set; }
-
 
         public BaseGraphicObject()
         {

@@ -11,7 +11,7 @@ namespace FillingShapes.Data
     public class Polygon : BaseGraphicObject
     {
         protected Boundaries _boundariesIndex;
-        protected Bitmap _texture;
+        protected DirectBitmap _texture;
         protected struct Boundaries
         {
             public int mostUp;
@@ -24,8 +24,15 @@ namespace FillingShapes.Data
         {
         }
 
-        public void SetTexture(Image image) => _texture = new Bitmap(image); 
-        
+        public void SetTexture(Image image)
+        {
+            Bitmap bitmap = new Bitmap(image);
+            _texture = new DirectBitmap(bitmap.Width, bitmap.Height);
+            for (int x = 0; x < bitmap.Width; x++)
+                for (int y = 0; y < bitmap.Height; y++)
+                    _texture.SetPixel(x, y, bitmap.GetPixel(x, y));
+        }
+
         public virtual void AddVertice(Vertice vertice)
         {
             _vertices.Add(vertice);
@@ -140,34 +147,30 @@ namespace FillingShapes.Data
             if (direction == Direction.None)
                 return;
             Point endingPoint = new Point(0, 0);
-            lock (_lock)
-            {
-                if (direction == Direction.Up)
-                    endingPoint = new Point(0, -_vertices[_boundariesIndex.mostUp].GetPosition().Y);
-                else if (direction == Direction.Down)
-                    endingPoint = new Point(0, Bitmap.Height - _vertices[_boundariesIndex.mostDown].GetPosition().Y - 1);
-                else if (direction == Direction.Right)
-                    endingPoint = new Point(Bitmap.Width - _vertices[_boundariesIndex.mostRight].GetPosition().X - 1, 0);
-                else if (direction == Direction.Left)
-                    endingPoint = new Point(-_vertices[_boundariesIndex.mostLeft].GetPosition().X, 0);
-            }
+            if (direction == Direction.Up)
+                endingPoint = new Point(0, -_vertices[_boundariesIndex.mostUp].GetPosition().Y);
+            else if (direction == Direction.Down)
+                endingPoint = new Point(0, Bitmap.Height - _vertices[_boundariesIndex.mostDown].GetPosition().Y - 1);
+            else if (direction == Direction.Right)
+                endingPoint = new Point(Bitmap.Width - _vertices[_boundariesIndex.mostRight].GetPosition().X - 1, 0);
+            else if (direction == Direction.Left)
+                endingPoint = new Point(-_vertices[_boundariesIndex.mostLeft].GetPosition().X, 0);
+
             if (endingPoint.X != 0 || endingPoint.Y != 0)
                 Move(new Point(0, 0), endingPoint);
         }
 
         public override Direction IsOutsideArea()
         {
-            lock (_lock)
-            {
-                if (_vertices[_boundariesIndex.mostLeft].GetPosition().X <= 0)
-                    return Direction.Left;
-                else if (_vertices[_boundariesIndex.mostRight].GetPosition().X >= Bitmap.Width - 1)
-                    return Direction.Right;
-                else if (_vertices[_boundariesIndex.mostUp].GetPosition().Y <= 0)
-                    return Direction.Up;
-                else if (_vertices[_boundariesIndex.mostDown].GetPosition().Y >= Bitmap.Height - 1)
-                    return Direction.Down;
-            }
+            if (_vertices[_boundariesIndex.mostLeft].GetPosition().X <= 0)
+                return Direction.Left;
+            else if (_vertices[_boundariesIndex.mostRight].GetPosition().X >= Bitmap.Width - 1)
+                return Direction.Right;
+            else if (_vertices[_boundariesIndex.mostUp].GetPosition().Y <= 0)
+                return Direction.Up;
+            else if (_vertices[_boundariesIndex.mostDown].GetPosition().Y >= Bitmap.Height - 1)
+                return Direction.Down;
+
             return Direction.None;
         }
 
@@ -246,12 +249,9 @@ namespace FillingShapes.Data
                 dy = first_point.Y - second_point.Y;
             }
             // Sprawdzam czy linia nie wychodzi poza bitmapę
-            lock (_lock)
+            if (Bitmap.Width > x && x >= 0 && Bitmap.Height > y && y >= 0)
             {
-                if (Bitmap.Width > x && x >= 0 && Bitmap.Height > y && y >= 0)
-                {
-                    Bitmap.SetPixel(x, y, color); 
-                }
+                Bitmap.SetPixel(x, y, color); 
             }
 
             // sprawdzamy czy odcinek jest "bardziej" pionowy czy poziomy
@@ -274,13 +274,11 @@ namespace FillingShapes.Data
                         d += b;
                         x += xFactor;
                     }
-                    lock (_lock)
+                    if (Bitmap.Width > x && x >= 0 && Bitmap.Height > y && y >= 0)
                     {
-                        if (Bitmap.Width > x && x >= 0 && Bitmap.Height > y && y >= 0)
-                        {
-                            Bitmap.SetPixel(x, y, color); 
-                        }
+                        Bitmap.SetPixel(x, y, color); 
                     }
+                    
                 }
             }
             else
@@ -302,13 +300,11 @@ namespace FillingShapes.Data
                         d += b;
                         y += yFactor;
                     }
-                    lock (_lock)
+                    if (Bitmap.Width > x && x >= 0 && Bitmap.Height > y && y >= 0)
                     {
-                        if (Bitmap.Width > x && x >= 0 && Bitmap.Height > y && y >= 0)
-                        {
-                            Bitmap.SetPixel(x, y, color);
-                        }
+                        Bitmap.SetPixel(x, y, color);
                     }
+      
                 }
             }
             return Task.FromResult(0);
@@ -343,31 +339,19 @@ namespace FillingShapes.Data
                 }
 
                 Aet.Sort((i, j) => CalculatePointPosition(i, y).X > CalculatePointPosition(j, y).X ? 1 : -1);
+                Task[] tasks = new Task[Aet.Count / 2];
                 for (int i = 0; i < Aet.Count - 1; i++)
                 {
                     if (i % 2 == 0)
                     {
                         Point left = CalculatePointPosition(Aet[i], y);
                         Point right = CalculatePointPosition(Aet[i + 1], y);
-                        Task[] tasks = new Task[right.X - left.X + 1];
-                        for (int x = left.X; x <= right.X; x++)
-                        {
-                            int width, height;
-                            lock(_lock)
-                            {
-                                width = Bitmap.Width;
-                                height = Bitmap.Height;
-                            }
-                            if (width > x && x >= 0 && height > y && y >= 0)
-                            {
-                                await ChooseColoring(x, y, Aet[i], left, Aet[i + 1], right);
-                            }
-                        };
-                        for (int j = 0; j < tasks.Length; j++)
-                            if (tasks[j] != null)
-                                await tasks[j];
+                        tasks[i / 2] = ChooseColoring(left, right.X - left.X, Aet[i], Aet[i + 1]);
                     }
-                };
+                }
+                for (int i = 0; i < tasks.Length; i++)
+                    if (tasks[i] != null)
+                        await tasks[i];
             }
         }
       
@@ -389,36 +373,51 @@ namespace FillingShapes.Data
             return new Point(x, height);
         }
 
-        protected async Task ChooseColoring(int x, int y, Edge leftEdge, Point leftPoint, Edge rightEdge, Point rightPoint)
+        protected async Task ChooseColoring(Point leftPoint, int width, Edge leftEdge, Edge rightEdge)
         {
             switch (ColoringType)
             {
                 case Coloring.Solid:
                     {
-                        SolidColoring(x, y);
+                        SolidColoring(leftPoint, width);
                         break;
                     }
                 case Coloring.Interpolation:
                     {
-                        await InterpolationColoring(x, y, leftEdge, leftPoint, rightEdge, rightPoint);
+                        await InterpolationColoring(leftPoint, width, leftEdge, rightEdge);
                         break;
                     }
                 case Coloring.Texture:
                     {
-                        TextureColoring(x, y);
+                        TextureColoring(leftPoint, width);
                         break;
                     }
             }
         }
 
-        protected void SolidColoring(int x, int y)
+        protected void SolidColoring(Point leftPoint, int width)
         {
-            lock (_lock) { Bitmap.SetPixel(x, y, _color); }
+            int y = leftPoint.Y;
+            if (Bitmap.Height <= y || y < 0)
+                return;
+
+            for (int x = leftPoint.X; x <= leftPoint.X + width; x++)
+            {
+                if (Bitmap.Width > x && x >= 0)
+                {
+                    Bitmap.SetPixel(x, y, _color);
+                }
+            }
         }
 
-        protected async Task InterpolationColoring(int x, int y, Edge leftEdge, Point leftPoint, Edge rightEdge, Point rightPoint)
+        protected async Task InterpolationColoring(Point leftPoint, int width, Edge leftEdge, Edge rightEdge)
         {
+            int y = leftPoint.Y;
+            if (Bitmap.Height <= y || y < 0)
+                return;
+
             var leftTask = CalculateColorOnLineSection(leftEdge, leftPoint);
+            var rightPoint = new Point(leftPoint.X + width, y);
             var rightTask = CalculateColorOnLineSection(rightEdge, rightPoint);
             await leftTask;
             Color leftPointColor = leftTask.Result;
@@ -427,8 +426,17 @@ namespace FillingShapes.Data
 
             Vertice leftVertice = new Vertice(leftPoint, leftPointColor);
             Vertice rightVertice = new Vertice(rightPoint, rightPointColor);
-            Color color = await CalculateColorOnLineSection(new Edge(rightVertice, leftVertice), new Point(x, y));
-            lock (_lock) { Bitmap.SetPixel(x, y, color); }
+           
+
+            for (int x = leftPoint.X; x <= leftPoint.X + width; x++)
+            {
+                Color color = await CalculateColorOnLineSection(new Edge(rightVertice, leftVertice), new Point(x, y));
+                if (Bitmap.Width > x && x >= 0)
+                {
+                    Bitmap.SetPixel(x, y, color);
+                }
+            }
+
         }
 
         private Task<Color> CalculateColorOnLineSection(Edge edge, Point point)
@@ -455,16 +463,32 @@ namespace FillingShapes.Data
             return Task.FromResult(color);
         }
 
-        protected void TextureColoring(int x, int y)
+        protected void TextureColoring(Point leftPoint, int width)
         {
-            int horizontal = x - _vertices[_boundariesIndex.mostLeft].GetPosition().X;
+            int y = leftPoint.Y;
+            if (Bitmap.Height <= y || y < 0)
+                return;
+
+            int horizontal = leftPoint.X - _vertices[_boundariesIndex.mostLeft].GetPosition().X;
             int vertical = y - _vertices[_boundariesIndex.mostUp].GetPosition().Y;
-            Color color;
-            if (horizontal >= _texture.Width || vertical >= _texture.Height)
-                color = Color.White;
-            else
-                color = _texture.GetPixel(horizontal, vertical);
-            lock (_lock) { Bitmap.SetPixel(x, y, color); }
+            while (horizontal >= _texture.Width)
+                horizontal -= _texture.Width;
+            while (vertical >= _texture.Height)
+                vertical -= _texture.Height;
+            Bitmap.SetPixel(leftPoint.X, y, _texture.GetPixel(horizontal, vertical));
+            for (int x = leftPoint.X + 1; x <= leftPoint.X + width; x++)
+            {
+                horizontal++;
+                if (horizontal >= _texture.Width)
+                    horizontal -= _texture.Width;
+                if (Bitmap.Width > x && x >= 0)
+                {
+                    Bitmap.SetPixel(x, y, _texture.GetPixel(horizontal, vertical));
+                }
+            }
+
+
+
         }
     }
 }
