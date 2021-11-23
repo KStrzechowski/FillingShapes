@@ -27,6 +27,7 @@ namespace FillingShapes
         {
             SetState();
             UnSelectShape();
+            DefaultOptions();
         }
 
         private void DrawAllShapes()
@@ -42,10 +43,23 @@ namespace FillingShapes
                 tasks[i] = polygon.Draw();
                 i++;
             };
+            if (_light != null)
+                _light.Draw();
 
             Task.WaitAll(tasks);
             if (task != null)
                 task.Wait();
+        }
+
+        private void SelectLight(Point point)
+        {
+            UnSelectShape();
+            if (_light != null && _light.CheckIfClicked(point))
+            {
+                _light.Select();
+                SelectedLight = _light;
+                SetState(State.SelectedLight);
+            }
         }
 
         private void SelectShape(Point point)
@@ -89,15 +103,39 @@ namespace FillingShapes
             DrawAllShapes();
         }
 
+        private void MoveLight(Light light, Point position)
+        {
+            light.Move(_position, position);
+            DrawAllShapes();
+        }
+
+        private void UnSelectAll()
+        {
+            UnSelectLight();
+            UnSelectShape();
+        }
+
+        private void UnSelectLight()
+        {
+            if (SelectedLight != null)
+            {
+                SelectedLight.UnSelect();
+                SelectedLight = null;
+                SetState(State.Default);
+                SetCorrectOptions();
+                DrawAllShapes();
+            }    
+        }
+
         private void UnSelectShape()
         {
             if (SelectedPolygon != null)
             {
                 UnSelectVertice();
-                HideAllOptions();
                 SelectedPolygon.UnSelect();
                 SelectedPolygon = null;
                 SetState(State.Default);
+                SetCorrectOptions();
                 DrawAllShapes();
             }
         }
@@ -154,12 +192,29 @@ namespace FillingShapes
                         EdgeOptions();
                         break;
                     }
+                case State.SelectedLight:
+                case State.MoveLight:
+                    {
+                        LightOptions();
+                        break;
+                    }
                 case State.Playing:
                     {
                         PlayingOptons();
                         break;
                     }
+                case State.Default:
+                    {
+                        DefaultOptions();
+                        break;
+                    }
             }
+        }
+
+        private void DefaultOptions()
+        {
+            createButton.Enabled = true;
+            lightButton.Enabled = true;
         }
 
         private void NewPolygonOptions()
@@ -186,10 +241,15 @@ namespace FillingShapes
             addButton.Enabled = true;
         }
 
+        private void LightOptions()
+        {
+            lightButton.Enabled = true;
+            colorButton.Enabled = true;
+        }
+
         private void PlayingOptons()
         {
             startButton.Text = "Pause";
-            createButton.Enabled = false;
             speedTrackBar.Enabled = true;
         }
 
@@ -198,9 +258,9 @@ namespace FillingShapes
             colorButton.Enabled = textureColoringButton.Enabled = false;
             solidColoringButton.Enabled = interpolationColoringButton.Enabled = false;
             addButton.Enabled = deleteButton.Enabled = false;
-            positionXTextBox.Enabled = positionYTextBox.Enabled = false;
             speedTrackBar.Enabled = false;
-            createButton.Enabled = true;
+            createButton.Enabled = false;
+            lightButton.Enabled = false;
             startButton.Text = "Start";
         }
 
@@ -282,6 +342,25 @@ namespace FillingShapes
                 SetBitmap();
             }
             DrawAllShapes();
+        }
+
+        public void AddLight()
+        {
+            if (_light != null)
+            {
+                foreach (var polygon in _polygons)
+                {
+                    polygon.Light = _light;
+                }
+            }
+        }
+
+        public void RemoveLight()
+        {
+            foreach (var polygon in _polygons)
+            {
+                polygon.Light = null;
+            }
         }
     }
 }

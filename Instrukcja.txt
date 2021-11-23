@@ -1,0 +1,25 @@
+ Możliwość dodawania nowego wielokąta, usuwania oraz edycji
+  Aby dodać wielokąt należy kliknąć przycisk "Create Polygon", wybrać położenie punktów, a następnie kliknąć przycik "Add"
+  Przy edycji:
+   - przesuwanie wierzchołka
+   - usuwanie wierzchołka
+   - dodawanie wierzchołka w środku wybranej krawędzi
+   - przesuwanie całego wielokąta
+ Aby wykonać jakieś zadanie na wielokącie/wierzchołku/świetle należy najpierw na nie kliknąć.
+ Aby zaznaczyć wierzchołek należy zaznaczyć wielokąt, a następnie kliknąć w wiezrchołek.
+ Aby zaznaczyć krawędź należy zaznaczyć wierzchołek, a następnie kolejny sąsiadujący.
+
+Możliwe sposoby kolorowania:
+  - jeden kolor
+  - interpolacja kolorów z wierzchołków
+  - wybór tekstury (jpg, png, bmp) - po naciśnięciu należy wybrać odpowiedni plik.
+
+Możemy zmienić kolor figury lub wierzchołka za pomocą przycisku "Choose Color"
+
+Po wciśnięciu przycisku "Start" figury zaczynają poruszać się w losowym kierunku.
+Po natrafieniu na ścianę odbijają się od niej.
+Pasek "Speed" definiuje prędkość poruszania się wielokątów.
+
+Istnieje możliwość dodania oświetlenia za pomocą przycisku "Add Light".
+Figury są oświetlane w zależności od odległości od światła oraz parametrów światła umieszczonych 
+w group boxie "lightBox". W celu zaimplementowania światła wykorzystano model oświetlania Lamberta.

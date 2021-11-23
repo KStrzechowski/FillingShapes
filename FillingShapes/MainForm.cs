@@ -18,8 +18,14 @@ namespace FillingShapes
     {
         private readonly List<Polygon> _polygons = new();
         List<IGraphicObject> _movingShapes;
+        private Light _light;
         private Point _position;
         private Speed _speed = new(5);
+        private double _Kd;
+        private double _Ks;
+        private int _M;
+        private int _lightHeight;
+        private Light SelectedLight { get; set; }
         private Polygon SelectedPolygon { get; set; }
         private Vertice SelectedVertice { get; set; }
         private Edge SelectedEdge { get; set; }
@@ -32,6 +38,7 @@ namespace FillingShapes
 
         private void MainForm_Load(object sender, EventArgs e)
         {
+            SetBitmap();
             HideAllOptions();
             SetAllDefault();
         }
@@ -44,7 +51,9 @@ namespace FillingShapes
             {
                 case State.Default:
                     {
-                        SelectShape(_position);
+                        SelectLight(_position);
+                        if (SelectedLight == null)
+                            SelectShape(_position);
                         break;
                     }
                 case State.NewShape:
@@ -79,6 +88,18 @@ namespace FillingShapes
                         UnSelectShape();
                         break;
                     }
+                case State.SelectedLight:
+                    {
+                        if (_light.CheckIfClicked(_position))
+                        {
+                            SetState(State.MoveLight);
+                        }
+                        else
+                        {
+                            UnSelectLight();
+                        }
+                        break;
+                    }
             }
             SetCorrectOptions();
             DrawAllShapes();
@@ -100,6 +121,11 @@ namespace FillingShapes
                         MoveVertice(SelectedPolygon, SelectedVertice, position);
                         break;
                     }
+                case State.MoveLight:
+                    {
+                        MoveLight(SelectedLight, position);
+                        break;
+                    }
             }
             _position = position;
         }
@@ -118,13 +144,18 @@ namespace FillingShapes
                         SetState(State.SelectedVertice);
                         break;
                     }
+                case State.MoveLight:
+                    {
+                        SetState(State.SelectedLight);
+                        break;
+                    }
             }
             DrawAllShapes();
         }
 
         private void createButton_MouseDown(object sender, MouseEventArgs e)
         {
-            UnSelectShape();
+            UnSelectAll();
             SetState();
             switch (State)
             {
@@ -147,6 +178,8 @@ namespace FillingShapes
                         if (SelectedPolygon.CheckIfCorrect())
                         {
                             _polygons.Add(SelectedPolygon);
+                            if (_light != null)
+                                SelectedPolygon.Light = _light;
                         }
                         break;
                     }
@@ -200,6 +233,14 @@ namespace FillingShapes
                         if (colorDialog.ShowDialog() == DialogResult.OK)
                         {
                             SelectedVertice.SetColor(colorDialog.Color);
+                        }
+                        break;
+                    }
+                case State.SelectedLight:
+                    {
+                        if (colorDialog.ShowDialog() == DialogResult.OK)
+                        {
+                            SelectedLight.SetColor(colorDialog.Color);
                         }
                         break;
                     }
@@ -267,6 +308,67 @@ namespace FillingShapes
                     }
             }
             DrawAllShapes();
+        }
+
+        private void lightButton_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (_light == null)
+            {
+                _light = new Light(new Point(20, 20), Color.White, _lightHeight, _M, _Kd, _Ks);
+                AddLight();
+                lightButton.Text = "Remove Light";
+            }
+            else
+            {
+                UnSelectLight();
+                _light = null;
+                RemoveLight();
+                lightButton.Text = "Add Light";
+            }
+            DrawAllShapes();
+        }
+
+        private void HeightTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                _lightHeight = int.Parse(HeightTextBox.Text);
+                if (_light != null)
+                {
+                    _light.z = _lightHeight;
+                    DrawAllShapes();
+                }
+            }
+        }
+
+        private void KdTrackBar_ValueChanged(object sender, EventArgs e)
+        {
+            _Kd = KdTrackBar.Value * 0.01;
+            if (_light != null)
+            {
+                _light.Kd = _Kd;
+                DrawAllShapes();
+            }
+        }
+
+        private void KsTrackBar_ValueChanged(object sender, EventArgs e)
+        {
+            _Ks = KsTrackBar.Value * 0.01;
+            if (_light != null)
+            {
+                _light.Ks = _Ks;
+                DrawAllShapes();
+            }
+        }
+
+        private void MTrackBar_ValueChanged(object sender, EventArgs e)
+        {
+            _M = MTrackBar.Value;
+            if (_light != null)
+            {
+                _light.m = _M;
+                DrawAllShapes();
+            }
         }
     }
 }

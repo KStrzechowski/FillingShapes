@@ -10,11 +10,13 @@ namespace FillingShapes.Data
 {
     public class Vertice : BaseGraphicObject
     {
+        protected int _radius;
         private Point _position;
         public Vertice(Point position)
         {
             _position = position;
             _color = Color.Orange;
+            _radius = 5;
         }
 
         public Vertice(Point position, Color color)
@@ -22,6 +24,7 @@ namespace FillingShapes.Data
             _position = position;
             IsOutsideArea();
             _color = color;
+            _radius = 5;
         }
 
         public Point GetPosition() => _position;
@@ -30,7 +33,7 @@ namespace FillingShapes.Data
 
         public override bool CheckIfClicked(Point point)
         {
-            if ((Math.Pow(GetPosition().X - point.X, 2) + Math.Pow(GetPosition().Y - point.Y, 2)) < 50)
+            if ((Math.Pow(GetPosition().X - point.X, 2) + Math.Pow(GetPosition().Y - point.Y, 2)) < _radius * _radius)
             {
                 return true;
             }
@@ -67,11 +70,7 @@ namespace FillingShapes.Data
 
         public override Task Draw()
         {
-            int radius = 5;
-            if (IsSelected)
-                Graphics.FillEllipse(new SolidBrush(_color), GetPosition().X - radius, GetPosition().Y - radius, radius * 2, radius * 2);
-            else
-                Graphics.FillEllipse(new SolidBrush(_color), GetPosition().X - radius, GetPosition().Y - radius, radius * 2, radius * 2);
+            Graphics.FillEllipse(new SolidBrush(_color), GetPosition().X - _radius, GetPosition().Y - _radius, _radius * 2, _radius * 2);
             return Task.FromResult(0);
         }
 

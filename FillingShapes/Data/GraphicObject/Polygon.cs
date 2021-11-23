@@ -12,6 +12,9 @@ namespace FillingShapes.Data
     {
         protected Boundaries _boundariesIndex;
         protected DirectBitmap _texture;
+        private Light _light;
+        public Light Light { get => _light; set => _light = value; }
+       
         protected struct Boundaries
         {
             public int mostUp;
@@ -20,8 +23,9 @@ namespace FillingShapes.Data
             public int mostLeft;
         }
 
-        public Polygon() : base()
+        public Polygon(Light light = null) : base()
         {
+            Light = light;
         }
 
         public void SetTexture(Image image)
@@ -69,6 +73,7 @@ namespace FillingShapes.Data
         {
             _vertices.Remove(vertice);
             Sort();
+            CheckBoundaries();
         }
 
         protected void Sort()
@@ -405,7 +410,7 @@ namespace FillingShapes.Data
             {
                 if (Bitmap.Width > x && x >= 0)
                 {
-                    Bitmap.SetPixel(x, y, _color);
+                    Bitmap.SetPixel(x, y, ApplyLight(x, y, _color));
                 }
             }
         }
@@ -425,15 +430,14 @@ namespace FillingShapes.Data
             Color rightPointColor = rightTask.Result;
 
             Vertice leftVertice = new Vertice(leftPoint, leftPointColor);
-            Vertice rightVertice = new Vertice(rightPoint, rightPointColor);
-           
+            Vertice rightVertice = new Vertice(rightPoint, rightPointColor);    
 
             for (int x = leftPoint.X; x <= leftPoint.X + width; x++)
             {
                 Color color = await CalculateColorOnLineSection(new Edge(rightVertice, leftVertice), new Point(x, y));
                 if (Bitmap.Width > x && x >= 0)
                 {
-                    Bitmap.SetPixel(x, y, color);
+                    Bitmap.SetPixel(x, y, ApplyLight(x, y, color));
                 }
             }
 
@@ -483,12 +487,32 @@ namespace FillingShapes.Data
                     horizontal -= _texture.Width;
                 if (Bitmap.Width > x && x >= 0)
                 {
-                    Bitmap.SetPixel(x, y, _texture.GetPixel(horizontal, vertical));
+                    Bitmap.SetPixel(x, y, ApplyLight(x, y, _texture.GetPixel(horizontal, vertical)));
                 }
             }
+        }
 
+        protected Color ApplyLight(int x, int y, Color color)
+        {
+            if (_light == null)
+                return color;
 
+            Vector N = new Vector(0, 0, 1);
+            int z = 0;
 
+            Vector L = new Vector(Math.Abs(_light.GetPosition().X - x), Math.Abs(_light.GetPosition().Y - y), Math.Abs(_light.z - z));
+            L.Normalize();
+            double cosNL = (N.x * L.x + N.y * L.y + N.z * L.z);
+            Vector R = new Vector(2 * cosNL * Math.Abs(N.x - L.x), 2 * cosNL * Math.Abs(N.y - L.y), 2 * cosNL * Math.Abs(N.z - L.z));
+            double cosVR = Math.Pow((R.z), 5);
+
+            int colorR = (int)(_light.Kd * (_light.GetColor().R / 255) * color.R * cosNL
+                + _light.Ks * (_light.GetColor().R / 255) * color.R * cosVR);
+            int colorG = (int)(_light.Kd * (_light.GetColor().G / 255) * color.G * cosNL
+                + _light.Ks * (_light.GetColor().G / 255) * color.G * cosVR);
+            int colorB = (int)(_light.Kd * (_light.GetColor().B / 255) * color.B * cosNL
+                + _light.Ks * (_light.GetColor().B / 255) * color.B * cosVR);
+            return Color.FromArgb(colorR, colorG, colorB);
         }
     }
 }

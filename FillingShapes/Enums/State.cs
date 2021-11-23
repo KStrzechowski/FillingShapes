@@ -13,8 +13,10 @@ namespace FillingShapes.Enums
         SelectedShape,
         SelectedVertice,
         SelectedEdge,
+        SelectedLight,
         MoveShape,
         MoveVertice,
+        MoveLight,
         Playing,
     }
 }
